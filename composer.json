@@ -1,4 +1,6 @@
 {
+  "name": "afpatmin/ViAuthServer",
   "type": "library",
   "description": "A library for connecting to ViAuth api",
+  "version": "1.0.1"
 }
