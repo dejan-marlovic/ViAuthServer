@@ -3,12 +3,11 @@
 //  is governed by a BSD-style license that can be found in the LICENSE file.
 
 const AUTH_BASE = "";
-const HTTP_ORIGIN = "*";
+const HTTP_ORIGIN = "";
 
 header('Accept-Charset: UTF-8');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Content-Type: application/json');
-//$http_origin = $_SERVER["HTTP_ORIGIN"];
 
 /// REMOVE IN PRODUCTION ///
 header("Access-Control-Allow-Origin: " . HTTP_ORIGIN);
@@ -29,43 +28,43 @@ if ($method === 'POST')
     require_once(__DIR__ . AUTH_BASE);
     $auth = new ViAuth();
 
-    $responseJSON = null;
+    $response = null;
 
     switch ($command)
     {
         case "login_with_token":
             validOrDie($input, ["Token"]);
-            $responseJSON = $auth->loginWithToken($input['token']);
+            $response = $auth->loginWithToken($input['token']);
             break;
 
         case "login_with_username_password":
             validOrDie($input, ["Username", "Password"]);
-            $responseJSON = $auth->loginWithUsernamePassword($input['username'], $input['password']);
+            $response = $auth->loginWithUsernamePassword($input['username'], $input['password']);
             break;
 
         case "register":
             validOrDie($input, ["Username"]);
-            $responseJSON = $auth->register($input['username'], isset($input['password']) ? $input['password'] : null);
+            $response = $auth->register($input['username'], isset($input['password']) ? $input['password'] : null);
             break;
 
         case "reset_password":
             validOrDie($input, ["Username", "Password", "Token"]);
-            $responseJSON = $auth->resetPassword($input['username'], $input['password'], $input['token']);
+            $response = $auth->resetPassword($input['username'], $input['password'], $input['token']);
             break;
 
         case "reset_token":
             validOrDie($input, ["Username"]);
-            $responseJSON = $auth->resetToken($input['username']);
+            $response = $auth->resetToken($input['username']);
             break;
 
         case "unregister":
             validOrDie($input, ["Username"]);
-            $responseJSON = $auth->unregister($input['username']);
+            $response = $auth->unregister($input['username']);
             break;
 
         case "validate_token":
             validOrDie($input, ["Token"]);
-            $responseJSON = $auth->validateToken($input['token']);
+            $response = $auth->validateToken($input['token']);
             break;
 
         default:
@@ -73,8 +72,7 @@ if ($method === 'POST')
             break;
     }
 
-    $response = json_decode($responseJSON);
-    respond($response['status'], $response['body']);
+    respond(http_response_code(), $response);
 }
 
 function validOrDie($input, $keys)
@@ -88,8 +86,5 @@ function validOrDie($input, $keys)
 function respond($status, $body)
 {
     http_response_code($status);
-    $response['status'] = $status;
-    $response['body'] = $body;
-
-    die(json_encode($response));
+    die($body);
 }

@@ -103,7 +103,7 @@ class ViAuth
         return array
         (
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_HEADER => 1,
+            /*CURLOPT_HEADER => 1,*/
             CURLOPT_HTTPHEADER => array('Authorization: Basic ' . $this->_authorization, 'Content-Type: application/json'),
             CURLOPT_URL => $url,
             CURLOPT_POST => 1,
