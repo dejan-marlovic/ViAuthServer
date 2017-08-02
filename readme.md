@@ -37,7 +37,6 @@ Edit [index.php], at the top of the file, set AUTH_BASE to the relative path whe
 domain from which you will call the API.
 
 #### Step 3 - Set credentials
-Edit [auth.php], at the top of the file, insert your API credentials under CLIENT_NAME 
-and CLIENT_KEY
+Edit [auth.php], at the top of the file, insert your API key under CLIENT_KEY
 
  

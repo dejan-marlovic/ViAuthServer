@@ -24,9 +24,10 @@ if ($method === 'POST')
     $command = preg_replace('/[^a-z0-9_]+/i','',array_shift($request));
 
     $input = json_decode(file_get_contents('php://input'), true);
+    if (!isset($input['client'])) respond(400, "Client not specified");
 
     require_once(__DIR__ . AUTH_BASE);
-    $auth = new ViAuth();
+    $auth = new ViAuth($input['client']);
 
     $response = null;
 

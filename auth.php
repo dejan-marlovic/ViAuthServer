@@ -1,13 +1,12 @@
 <?
 
-const CLIENT_NAME = "";
 const CLIENT_KEY = "";
 
 class ViAuth
 {
-    public function __construct()
+    public function __construct($clientName)
     {
-        $this->_authorization = base64_encode(CLIENT_NAME . ':' . CLIENT_KEY);
+        $this->_authorization = base64_encode($clientName . ':' . CLIENT_KEY);
     }
 
     public function loginWithToken($token)
