@@ -33,6 +33,11 @@ if ($method === 'POST')
 
     switch ($command)
     {
+        case "fetch_last_login":
+            validOrDie($input, ["Username"]);
+            $response = $auth->fetchLastLogin($input['username']);
+            break;
+
         case "login_with_token":
             validOrDie($input, ["Token"]);
             $response = $auth->loginWithToken($input['token']);

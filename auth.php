@@ -9,6 +9,18 @@ class ViAuth
         $this->_authorization = base64_encode($clientName . ':' . CLIENT_KEY);
     }
 
+    public function fetchLastLogin($username)
+    {
+        $curl = curl_init();
+        $url = $this->_apiBase . 'users/fetch_last_login';
+        $fields['username'] = $username;
+        curl_setopt_array($curl, $this->_generateBody($url, $fields));
+        $response = curl_exec($curl);
+        http_response_code(curl_getinfo($curl, CURLINFO_HTTP_CODE));
+        curl_close($curl);
+        return $response;
+    }
+
     public function loginWithToken($token)
     {
         $curl = curl_init();
