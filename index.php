@@ -9,8 +9,9 @@ header('Accept-Charset: UTF-8');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Content-Type: application/json');
 
-/// REMOVE IN PRODUCTION ///
 header("Access-Control-Allow-Origin: " . HTTP_ORIGIN);
+
+/// REMOVE IN PRODUCTION ///
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 ////////////////////////////
@@ -53,14 +54,33 @@ if ($method === 'POST')
             $response = $auth->register($input['username'], isset($input['password']) ? $input['password'] : null);
             break;
 
-        case "reset_password":
+        case "update_password":
             validOrDie($input, ["Username", "Password", "Token"]);
-            $response = $auth->resetPassword($input['username'], $input['password'], $input['token']);
+            $response = $auth->updatePassword($input['username'], $input['password'], $input['token']);
             break;
 
-        case "reset_token":
-            validOrDie($input, ["Username"]);
-            $response = $auth->resetToken($input['username']);
+        case "send_credentials":
+            validOrDie($input, ["username", "message", "send_email", "send_sms"]);
+            $token = $auth->resetToken($input['username']);
+            $message = urldecode($input['message']);
+
+            if (strpos($message, "%password%") >= 0)
+            {
+                /**
+                 * TODO generate random password
+                 */
+                $password = "abc123";
+                $message = str_replace("%password%", $password, $message);
+                $token = $auth->updatePassword($input['username'], $password, $token);
+            }
+            $message = str_replace("%token%", $token, $message);
+            $message = str_replace("%username%", $input['username'], $message);
+
+            /**
+             * TODO send credentials
+             */
+            //mail('patrick.minogue@gmail.com', "hej", $input['message']);
+
             break;
 
         case "unregister":

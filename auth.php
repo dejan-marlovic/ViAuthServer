@@ -59,20 +59,6 @@ class ViAuth
         return $response;
     }
 
-    public function resetPassword($username, $password, $token)
-    {
-        $curl = curl_init();
-        $url = $this->_apiBase . 'users/reset_password';
-        $fields['username'] = $username;
-        $fields['password'] = $password;
-        $fields['token'] = $token;
-        curl_setopt_array($curl, $this->_generateBody($url, $fields));
-        $response = curl_exec($curl);
-        http_response_code(curl_getinfo($curl, CURLINFO_HTTP_CODE));
-        curl_close($curl);
-        return $response;
-    }
-
     public function resetToken($username)
     {
         $curl = curl_init();
@@ -90,6 +76,20 @@ class ViAuth
         $curl = curl_init();
         $url = $this->_apiBase . 'users/unregister';
         $fields['username'] = $username;
+        curl_setopt_array($curl, $this->_generateBody($url, $fields));
+        $response = curl_exec($curl);
+        http_response_code(curl_getinfo($curl, CURLINFO_HTTP_CODE));
+        curl_close($curl);
+        return $response;
+    }
+
+    public function updatePassword($username, $password, $token)
+    {
+        $curl = curl_init();
+        $url = $this->_apiBase . 'users/update_password';
+        $fields['username'] = $username;
+        $fields['password'] = $password;
+        $fields['token'] = $token;
         curl_setopt_array($curl, $this->_generateBody($url, $fields));
         $response = curl_exec($curl);
         http_response_code(curl_getinfo($curl, CURLINFO_HTTP_CODE));

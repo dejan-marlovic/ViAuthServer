@@ -25,18 +25,24 @@ composer.json should look like this (ignoring any other dependencies):
 ```
 
 #### Step 2 - Setup file access:
-The installation contains two files of importance
+The installation contains two files of importance:
 * auth.php
 * index.php
 
-Move [index.php] to a public web folder, and make sure [auth.php] is not accessible 
-from the web.
+Move [index.php] to a public web folder, and move [auth.php] to a private web folder.
 
 Edit [index.php], at the top of the file, set AUTH_BASE to the relative path where 
 [auth.php] is located (ex. *'../../lib/auth.php'*). Set HTTP_ORIGIN to your the 
 domain from which you will call the API.
 
-#### Step 3 - Set credentials
-Edit [auth.php], at the top of the file, insert your API key under CLIENT_KEY
 
- 
+#### Step 3 - Setup sendCredentials logic:
+Edit [index.php], located the section where it says 'TODO - send credentials'.
+
+Send the contents of [message] to the users email/phone, you can fetch the users' 
+details in your system with [username].
+
+
+
+#### Step 4 - Set credentials:
+Edit [auth.php], at the top of the file, insert your API key under CLIENT_KEY
