@@ -7,9 +7,8 @@ const HTTP_ORIGIN = "";
 
 header('Accept-Charset: UTF-8');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Content-Type: application/json');
-
 header("Access-Control-Allow-Origin: " . HTTP_ORIGIN);
+header('Content-Type: application/json');
 
 /// REMOVE IN PRODUCTION ///
 ini_set('display_errors', 1);
@@ -60,27 +59,48 @@ if ($method === 'POST')
             break;
 
         case "send_credentials":
-            validOrDie($input, ["username", "message", "send_email", "send_sms"]);
-            $token = $auth->resetToken($input['username']);
-            $message = urldecode($input['message']);
-
-            if (strpos($message, "%password%") >= 0)
+            validOrDie($input, ["username"]);
+            if (empty($input['email_message']) && empty($input['sms_message']))
             {
-                /**
-                 * TODO generate random password
-                 */
-                $password = "abc123";
-                $message = str_replace("%password%", $password, $message);
-                $token = $auth->updatePassword($input['username'], $password, $token);
+                respond(401, "error_no_message_specified");
             }
-            $message = str_replace("%token%", $token, $message);
-            $message = str_replace("%username%", $input['username'], $message);
+
+            $token = $auth->resetToken($input['username']);
+            if (http_response_code() != 200) die("error_user_not_found");
 
             /**
-             * TODO send credentials
+             * Parse placeholders
              */
-            //mail('patrick.minogue@gmail.com', "hej", $input['message']);
+            $emailMessage = urldecode($input['email_message']);
+            $smsMessage = urldecode($input['sms_message']);
+            if (strpos($emailMessage, "%password%") >= 0 || strpos($smsMessage, "%password%") >= 0)
+            {
+                $password = bin2hex(openssl_random_pseudo_bytes(4));
+                $emailMessage = str_replace("%password%", $password, $emailMessage);
+                $smsMessage = str_replace("%password%", $password, $smsMessage);
 
+                $token = $auth->updatePassword($input['username'], $password, $token);
+                if (http_response_code() != 200) { die("error_could_not_update_password"); }
+            }
+
+            $emailMessage = str_replace("%token%", $token, $emailMessage);
+            $emailMessage = str_replace("%username%", $input['username'], $emailMessage);
+            $smsMessage = str_replace("%token%", $token, $smsMessage);
+            $smsMessage = str_replace("%username%", $input['username'], $smsMessage);
+
+            /**
+             * Call logic implemented by client
+             */
+            sendCredentials(
+                $input['client'],
+                $input['username'],
+                $input['email_from'],
+                $emailMessage,
+                $input['email_subject'],
+                $input['sms_from'],
+                $smsMessage);
+
+            $response = null;
             break;
 
         case "unregister":
@@ -94,7 +114,7 @@ if ($method === 'POST')
             break;
 
         default:
-            respond(404, "Command '$command' not found");
+            respond(404, "error_command_not_found");
             break;
     }
 
@@ -105,7 +125,7 @@ function validOrDie($input, $keys)
 {
     foreach ($keys as $key)
     {
-        if (empty($input[strtolower($key)])) respond(401, "$key not specified");
+        if (empty($input[strtolower($key)])) respond(401, "Missing required key: '${key}'");
     }
 }
 
@@ -113,4 +133,12 @@ function respond($status, $body)
 {
     http_response_code($status);
     die($body);
+}
+
+function sendCredentials($client, $username, $emailFrom, $emailMessage, $emailSubject, $smsFrom, $smsMessage)
+{
+    /**
+     * TODO send credentials to the user within your system
+     */
+
 }

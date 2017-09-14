@@ -36,8 +36,9 @@ Edit [index.php], at the top of the file, set AUTH_BASE to the relative path whe
 domain from which you will call the API.
 
 
-#### Step 3 - Setup sendCredentials logic:
-Edit [index.php], located the section where it says 'TODO - send credentials'.
+#### Step 3 - implement sendCredentials():
+Edit [index.php], at the bottom there's a function sendCredentials(), this is where
+you implement the code to send a message containing the user's credentials to the user
 
 Send the contents of [message] to the users email/phone, you can fetch the users' 
 details in your system with [username].
