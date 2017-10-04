@@ -65,27 +65,30 @@ if ($method === 'POST')
                 respond(401, "error_no_message_specified");
             }
 
-            $token = $auth->resetToken($input['username']);
-            if (http_response_code() != 200) die("error_user_not_found");
-
             /**
              * Parse placeholders
              */
             $emailMessage = urldecode($input['email_message']);
             $smsMessage = urldecode($input['sms_message']);
+
+            // Reset password
             if (strpos($emailMessage, "%password%") >= 0 || strpos($smsMessage, "%password%") >= 0)
             {
                 $password = bin2hex(openssl_random_pseudo_bytes(4));
                 $emailMessage = str_replace("%password%", $password, $emailMessage);
                 $smsMessage = str_replace("%password%", $password, $smsMessage);
 
+                $token = $auth->resetToken($input['username']);
+                if (http_response_code() != 200) die("Could not reset token for user " . $input['username']);
+
                 $token = $auth->updatePassword($input['username'], $password, $token);
-                if (http_response_code() != 200) { die("error_could_not_update_password"); }
+                if (http_response_code() != 200) die("Could not update password for user " . $input['username']);
+
+                $emailMessage = str_replace("%token%", $token, $emailMessage);
+                $smsMessage = str_replace("%token%", $token, $smsMessage);
             }
 
-            $emailMessage = str_replace("%token%", $token, $emailMessage);
             $emailMessage = str_replace("%username%", $input['username'], $emailMessage);
-            $smsMessage = str_replace("%token%", $token, $smsMessage);
             $smsMessage = str_replace("%username%", $input['username'], $smsMessage);
 
             /**
